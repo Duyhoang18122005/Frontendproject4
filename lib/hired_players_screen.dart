@@ -88,8 +88,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           ],
                         ),
                         onTap: () async {
-                          // Chỉ xử lý nếu là thông báo thuê mới và có orderId
-                          if (item['type'] == 'rent' && item['orderId'] != null) {
+                          // Chỉ xử lý nếu là thông báo thuê mới hoặc đã gửi yêu cầu thuê và có orderId
+                          if ((item['type'] == 'rent' || item['type'] == 'rent_request') && item['orderId'] != null) {
                             showDialog(
                               context: context,
                               barrierDismissible: false,

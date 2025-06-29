@@ -101,7 +101,7 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
         endTime: selectedEndTime!,
         hours: totalHours > 0 ? totalHours : 1,
         userId: userId,
-        message: messageController.text.trim(),
+        specialRequest: messageController.text.trim(),
       );
       setState(() { isLoading = false; });
 
@@ -282,7 +282,7 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            const Text('Gửi tin nhắn', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('Yêu cầu đặc biệt', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             TextField(
               controller: messageController,

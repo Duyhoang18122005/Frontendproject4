@@ -707,8 +707,8 @@ class ApiService {
     required DateTime startTime,
     required DateTime endTime,
     int? hours,
-    String? message, // message không có trong BE mới, giữ lại cho tương thích UI
     int? userId, // nếu cần truyền userId, lấy từ token hoặc truyền vào
+    String? specialRequest,
   }) async {
     final token = await storage.read(key: 'jwt');
     final url = Uri.parse('${ApiConfig.baseUrl}/api/game-players/$playerId/hire');
@@ -719,6 +719,7 @@ class ApiService {
       'coin': coin,
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
+      if (specialRequest != null && specialRequest.isNotEmpty) 'specialRequest': specialRequest,
     };
     final response = await http.post(
       url,

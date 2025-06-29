@@ -34,11 +34,18 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
   Map<String, dynamic>? orderDetail;
   Timer? _countdownTimer;
   Duration? remainingTime;
+  Map<String, dynamic>? currentUser;
+  bool isPlayer = false;
 
   @override
   void initState() {
     super.initState();
     fetchOrder();
+    ApiService.getCurrentUser().then((user) {
+      setState(() {
+        currentUser = user;
+      });
+    });
   }
 
   @override
@@ -145,11 +152,18 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
     final hours = orderDetail?['hours'] ?? widget.hours;
     final totalCoin = orderDetail?['totalCoin'] ?? widget.totalCoin;
     final startTime = orderDetail?['startTime']?.toString() ?? widget.startTime;
-    final customerNote = orderDetail?['customerNote'] ?? 'Không có';
+    final specialRequest = orderDetail?['specialRequest'] ?? orderDetail?['description'] ?? 'Không có';
     final servicePrice = totalCoin;
     final hireTime = '';
     final hireDate = startTime.length >= 10 ? startTime.substring(0, 10) : startTime;
     final confirmTime = '26:50';
+
+    // Xác định vai trò
+    final userId = currentUser != null ? currentUser!['id']?.toString() : null;
+    final orderUserId = orderDetail?['hirerId']?.toString();
+    final orderPlayerId = orderDetail?['playerId']?.toString();
+    final isCurrentPlayer = userId != null && (userId == orderPlayerId);
+    final isCurrentUser = userId != null && (userId == orderUserId);
 
     // Format lại thời gian đặt đơn
     String formattedOrderTime = '';
@@ -179,10 +193,18 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
       hireDateDisplay = hireDate;
     }
 
+    // Lấy tên hiển thị đúng vai trò
+    String displayName = playerName;
+    if (isCurrentPlayer) {
+      displayName = orderDetail?['hirerName'] ?? '';
+    } else if (isCurrentUser) {
+      displayName = orderDetail?['playerName'] ?? '';
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F9),
       appBar: AppBar(
-        title: const Text('Xác nhận đơn hàng'),
+        title: Text(isCurrentPlayer ? 'Xác nhận đơn hàng' : 'Chi tiết đơn hàng'),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
@@ -196,7 +218,7 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Thông tin người chơi
+                  // Thông tin người chơi (luôn là player)
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -228,7 +250,7 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Text(playerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                  Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -321,7 +343,12 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
                             color: Colors.blue.shade50,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(customerNote, style: const TextStyle(color: Colors.black87)),
+                          child: Text(
+                            (specialRequest != null && specialRequest.toString().trim().isNotEmpty)
+                              ? specialRequest
+                              : 'Không có',
+                            style: const TextStyle(color: Colors.black87),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Row(
@@ -351,89 +378,127 @@ class _HireConfirmationScreenState extends State<HireConfirmationScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Lưu ý quan trọng
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Lưu ý quan trọng', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
-                        const SizedBox(height: 8),
-                        Row(
+                  // Lưu ý/nút xác nhận/từ chối chỉ cho player
+                  if (isCurrentPlayer) ...[
+                    if (orderStatus == 'PENDING' || orderStatus == null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.timer, color: Colors.red, size: 18),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                'Bạn cần xác nhận đơn hàng trong vòng ${_formatDuration(remainingTime)} để tránh mất đơn',
-                                style: const TextStyle(color: Colors.red),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            const Text('Lưu ý quan trọng', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.timer, color: Colors.red, size: 18),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'Bạn cần xác nhận đơn hàng trong vòng ${_formatDuration(remainingTime)} để tránh mất đơn',
+                                    style: const TextStyle(color: Colors.red),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 8),
+                            const Text('Nếu từ chối đơn, vui lòng cung cấp lý do để chúng tôi hỗ trợ khách hàng tốt hơn.'),
+                            const SizedBox(height: 4),
+                            const Text('Sau khi xác nhận, bạn sẽ được kết nối với khách hàng qua ứng dụng chat.'),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        const Text('Nếu từ chối đơn, vui lòng cung cấp lý do để chúng tôi hỗ trợ khách hàng tốt hơn.'),
-                        const SizedBox(height: 4),
-                        const Text('Sau khi xác nhận, bạn sẽ được kết nối với khách hàng qua ứng dụng chat.'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Nút hành động hoặc thông báo trạng thái
-                  if (orderStatus == 'PENDING' || orderStatus == null)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _rejectOrder,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              side: const BorderSide(color: Colors.red),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _rejectOrder,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: const Text('Từ chối đơn', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            child: const Text('Từ chối đơn', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _confirmOrder,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: _confirmOrder,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: const Text('Xác nhận đơn', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                            child: const Text('Xác nhận đơn', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
-                        ),
-                      ],
-                    )
-                  else if (orderStatus == 'CONFIRMED')
-                    Center(
-                      child: Column(
-                        children: const [
-                          Icon(Icons.check_circle, color: Colors.green, size: 48),
-                          SizedBox(height: 8),
-                          Text('Đơn đã xác nhận thành công', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 18)),
                         ],
                       ),
-                    )
-                  else if (orderStatus == 'REJECTED')
-                    Center(
-                      child: Column(
-                        children: const [
-                          Icon(Icons.cancel, color: Colors.red, size: 48),
-                          SizedBox(height: 8),
-                          Text('Đơn đã từ chối thành công', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18)),
-                        ],
+                    ]
+                    else if (orderStatus == 'CONFIRMED') ...[
+                      Center(
+                        child: Column(
+                          children: const [
+                            Icon(Icons.check_circle, color: Colors.green, size: 48),
+                            SizedBox(height: 8),
+                            Text('Đơn đã xác nhận thành công', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
                       ),
-                    ),
+                    ]
+                    else if (orderStatus == 'REJECTED') ...[
+                      Center(
+                        child: Column(
+                          children: const [
+                            Icon(Icons.cancel, color: Colors.red, size: 48),
+                            SizedBox(height: 8),
+                            Text('Đơn đã từ chối thành công', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                    ]
+                  ]
+                  // Nếu là user: chỉ hiện trạng thái đơn
+                  else ...[
+                    const SizedBox(height: 8),
+                    if (orderStatus == 'PENDING' || orderStatus == null)
+                      Center(
+                        child: Column(
+                          children: const [
+                            Icon(Icons.hourglass_empty, color: Colors.orange, size: 48),
+                            SizedBox(height: 8),
+                            Text('Đơn đang chờ xác nhận', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                      )
+                    else if (orderStatus == 'CONFIRMED')
+                      Center(
+                        child: Column(
+                          children: const [
+                            Icon(Icons.check_circle, color: Colors.green, size: 48),
+                            SizedBox(height: 8),
+                            Text('Đơn đã được xác nhận', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                      )
+                    else if (orderStatus == 'REJECTED')
+                      Center(
+                        child: Column(
+                          children: const [
+                            Icon(Icons.cancel, color: Colors.red, size: 48),
+                            SizedBox(height: 8),
+                            Text('Đơn đã bị từ chối', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                  ],
                 ],
               ),
             ),
