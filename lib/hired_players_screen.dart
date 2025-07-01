@@ -23,6 +23,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final data = await ApiService.fetchNotifications();
     // Lọc bỏ thông báo tin nhắn
     final filtered = data.where((n) => n['type'] != 'message').toList();
+    // Sắp xếp theo thời gian mới nhất
+    filtered.sort((a, b) {
+      final aTime = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+      final bTime = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+      return bTime.compareTo(aTime);
+    });
     setState(() {
       notifications = filtered;
       isLoading = false;

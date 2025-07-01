@@ -144,14 +144,14 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFFFFF8E1),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
+                    color: Colors.orange.withOpacity(0.06),
+                    blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -159,11 +159,11 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.orange[100],
-                    child: const Icon(Icons.person, size: 36, color: Colors.deepOrange),
+                    radius: 36,
+                    backgroundColor: const Color(0xFFFFE0B2),
+                    child: const Icon(Icons.person, size: 40, color: Color(0xFFFFA726)),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 18),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,22 +172,29 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
                           children: [
                             Text(
                               widget.player['username'] ?? '',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.grey[800]),
                             ),
-                            const SizedBox(width: 6),
-                            const Text('🍊', style: TextStyle(fontSize: 18)),
+                            const SizedBox(width: 8),
+
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Color(0xFFFF7E5F), Color(0xFFFFB347)]),
+                            gradient: const LinearGradient(colors: [Color(0xFFFFB74D), Color(0xFFFFE082)]),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(
-                            '${widget.player['pricePerHour'] ?? '0'} xu/h',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.monetization_on, color: Colors.white, size: 18),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${widget.player['pricePerHour'] ?? '0'} xu/h',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -196,119 +203,213 @@ class _HirePlayerScreenState extends State<HirePlayerScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            const Text('Số dư hiện tại', style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 4),
-            Text(
-              walletBalance != null ? walletBalance.toString() : '...',
-              style: const TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text('Tổng xu cần: $totalCoin', style: const TextStyle(fontSize: 15, color: Colors.black54)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
             Row(
               children: [
-                const Text('Thời gian bắt đầu:', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: now,
-                      firstDate: now,
-                      lastDate: now.add(const Duration(days: 7)),
-                    );
-                    if (picked != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(now.add(const Duration(minutes: 1))),
-                      );
-                      if (time != null) {
-                        setState(() {
-                          selectedStartTime = DateTime(
-                            picked.year, picked.month, picked.day, time.hour, time.minute,
-                          );
-                        });
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.account_balance_wallet, color: Color(0xFFFFA726), size: 22),
+                        const SizedBox(width: 8),
+                        Text('Số dư:', style: TextStyle(fontSize: 15, color: Colors.grey[700])),
+                        const SizedBox(width: 4),
+                        Text(
+                          walletBalance != null ? walletBalance.toString() : '...',
+                          style: TextStyle(color: Colors.grey[800], fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(selectedStartTime == null
-                      ? 'Chọn thời gian'
-                      : '${selectedStartTime!.day}/${selectedStartTime!.month} ${selectedStartTime!.hour}:${selectedStartTime!.minute.toString().padLeft(2, '0')}'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calculate, color: Color(0xFFFFA726), size: 22),
+                        const SizedBox(width: 8),
+                        Text('Cần:', style: TextStyle(fontSize: 15, color: Colors.grey[700])),
+                        const SizedBox(width: 4),
+                        Text('$totalCoin', style: TextStyle(fontSize: 17, color: Colors.grey[800], fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 22),
             Row(
               children: [
-                const Text('Thời gian kết thúc:', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final now = selectedStartTime ?? DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: now,
-                      firstDate: now,
-                      lastDate: now.add(const Duration(days: 7)),
-                    );
-                    if (picked != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
-                      );
-                      if (time != null) {
-                        setState(() {
-                          selectedEndTime = DateTime(
-                            picked.year, picked.month, picked.day, time.hour, time.minute,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Bắt đầu', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey[800])),
+                      const SizedBox(height: 6),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.access_time, size: 18, color: Color(0xFFFFA726)),
+                        label: Text(selectedStartTime == null
+                            ? 'Chọn thời gian'
+                            : '${selectedStartTime!.day}/${selectedStartTime!.month} ${selectedStartTime!.hour}:${selectedStartTime!.minute.toString().padLeft(2, '0')}',
+                          style: TextStyle(color: Colors.grey[800])),
+                        onPressed: () async {
+                          final now = DateTime.now();
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: now,
+                            lastDate: now.add(const Duration(days: 7)),
                           );
-                        });
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          if (picked != null) {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(now.add(const Duration(minutes: 1))),
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedStartTime = DateTime(
+                                  picked.year, picked.month, picked.day, time.hour, time.minute,
+                                );
+                              });
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFF3E0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                          elevation: 0,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text(selectedEndTime == null
-                      ? 'Chọn thời gian'
-                      : '${selectedEndTime!.day}/${selectedEndTime!.month} ${selectedEndTime!.hour}:${selectedEndTime!.minute.toString().padLeft(2, '0')}'),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Kết thúc', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey[800])),
+                      const SizedBox(height: 6),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.access_time_filled, size: 18, color: Color(0xFFFFA726)),
+                        label: Text(selectedEndTime == null
+                            ? 'Chọn thời gian'
+                            : '${selectedEndTime!.day}/${selectedEndTime!.month} ${selectedEndTime!.hour}:${selectedEndTime!.minute.toString().padLeft(2, '0')}',
+                          style: TextStyle(color: Colors.grey[800])),
+                        onPressed: () async {
+                          final now = selectedStartTime ?? DateTime.now();
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: now,
+                            lastDate: now.add(const Duration(days: 7)),
+                          );
+                          if (picked != null) {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedEndTime = DateTime(
+                                  picked.year, picked.month, picked.day, time.hour, time.minute,
+                                );
+                              });
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFF3E0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                          elevation: 0,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            const Text('Yêu cầu đặc biệt', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            if (selectedStartTime != null && selectedEndTime != null && !selectedEndTime!.isAfter(selectedStartTime!))
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text('Thời gian kết thúc phải sau thời gian bắt đầu!', style: TextStyle(color: Colors.red[400], fontWeight: FontWeight.w500)),
+              ),
+            const SizedBox(height: 22),
+            const Text('Yêu cầu đặc biệt', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF616161))),
             const SizedBox(height: 8),
-            TextField(
-              controller: messageController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'Nhập tin nhắn',
-                border: OutlineInputBorder(),
-                filled: true,
-                fillColor: Color(0xFFF7F7F9),
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFF5F7FA),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: TextField(
+                controller: messageController,
+                maxLines: 3,
+                style: TextStyle(color: Colors.grey[800]),
+                decoration: const InputDecoration(
+                  hintText: 'Bạn muốn player lưu ý điều gì? (VD: Chơi vị trí xạ thủ, không nói tục... )',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
               ),
             ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFFFFB74D), Color(0xFFFFE082)]),
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.12),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                onPressed: isLoading || walletBalance == null || walletBalance! < 1 || selectedStartTime == null || selectedEndTime == null || !selectedEndTime!.isAfter(selectedStartTime!)
-                    ? null
-                    : _handleHire,
-                child: isLoading
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Thuê người chơi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                    elevation: 0,
+                  ),
+                  onPressed: isLoading || walletBalance == null || walletBalance! < 1 || selectedStartTime == null || selectedEndTime == null || !selectedEndTime!.isAfter(selectedStartTime!)
+                      ? null
+                      : _handleHire,
+                  child: isLoading
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text('Thuê người chơi', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
               ),
             ),
           ],

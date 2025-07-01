@@ -184,7 +184,7 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                 Container(
                   height: 120,
                   decoration: BoxDecoration(
-                    color: Colors.deepOrange.withOpacity(0.1),
+                    color: const Color(0xFFFFF8E1),
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(32),
                       bottomRight: Radius.circular(32),
@@ -195,11 +195,11 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                   top: 24,
                   child: CircleAvatar(
                     radius: 56,
-                    backgroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFFFF3E0),
                     child: CircleAvatar(
                       radius: 52,
-                      backgroundColor: Colors.orange[100],
-                      child: const Icon(Icons.person, size: 52, color: Colors.deepOrange),
+                      backgroundColor: const Color(0xFFFFE0B2),
+                      child: const Icon(Icons.person, size: 52, color: Color(0xFFFFA726)),
                     ),
                   ),
                 ),
@@ -217,7 +217,7 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
             const SizedBox(height: 12),
             Text(
               player['username'] ?? '',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.grey[800]),
             ),
             const SizedBox(height: 4),
             // Đánh giá và theo dõi
@@ -230,7 +230,7 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFollowing ? Colors.grey : Colors.orange,
+                    backgroundColor: isFollowing ? Colors.grey[400] : const Color(0xFFFFB74D),
                     shape: const StadiumBorder(),
                   ),
                   onPressed: isLoadingFollow ? null : _handleFollow,
@@ -247,13 +247,13 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFFFF3E0),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.deepOrange.withOpacity(0.08),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
+                      color: Colors.orange.withOpacity(0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -297,7 +297,7 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                               borderRadius: BorderRadius.circular(32),
                             ),
                             elevation: 0,
-                            backgroundColor: Colors.orange,
+                            backgroundColor: const Color(0xFFFFB74D),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -399,9 +399,9 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.orange[100],
+                      color: const Color(0xFFFFE0B2),
                     ),
-                    child: const Icon(Icons.person, size: 36, color: Colors.deepOrange),
+                    child: const Icon(Icons.person, size: 36, color: Color(0xFFFFA726)),
                   ),
                   const SizedBox(width: 8),
                   Container(
@@ -409,9 +409,9 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.orange[100],
+                      color: const Color(0xFFFFE0B2),
                     ),
-                    child: const Icon(Icons.person, size: 36, color: Colors.deepOrange),
+                    child: const Icon(Icons.person, size: 36, color: Color(0xFFFFA726)),
                   ),
                   const SizedBox(width: 8),
                   Container(
@@ -419,9 +419,9 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.orange[100],
+                      color: const Color(0xFFFFE0B2),
                     ),
-                    child: const Icon(Icons.person, size: 36, color: Colors.deepOrange),
+                    child: const Icon(Icons.person, size: 36, color: Color(0xFFFFA726)),
                   ),
                   const SizedBox(width: 8),
                   Stack(
@@ -431,9 +431,9 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                         height: 60,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: Colors.orange[100],
+                          color: const Color(0xFFFFE0B2),
                         ),
-                        child: const Icon(Icons.person, size: 36, color: Colors.deepOrange),
+                        child: const Icon(Icons.person, size: 36, color: Color(0xFFFFA726)),
                       ),
                       const Positioned.fill(
                         child: Center(
@@ -453,12 +453,12 @@ class _PlayerDetailScreenState extends State<PlayerDetailScreen> {
                   children: const [
                     Text(
                       'VUI LÒNG NHẮN TIN TRƯỚC KHI THUÊ !',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF616161)),
                     ),
                     SizedBox(height: 8),
                     Text(
                       'CHỈ DÙNG DUY NHẤT MỘT ACC PLAYDUO NÀY VÀ MỘT FACEBOOK NHƯ LINK DƯỚI',
-                      style: TextStyle(color: Colors.black54),
+                      style: TextStyle(color: Color(0xFF9E9E9E)),
                       textAlign: TextAlign.center,
                     ),
                   ],

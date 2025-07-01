@@ -7,6 +7,9 @@ import 'update_profile_screen.dart';
 import 'update_player_screen.dart';
 import 'policy_screen.dart';
 import 'change_password_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -24,6 +27,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool isPlayer = false;
   bool _didCheckPlayer = false;
   bool _isCheckingPlayer = false;
+  String? playerId;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -74,6 +80,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() {
         isPlayer = players.isNotEmpty;
+        if (isPlayer) {
+          playerId = players[0]['id'].toString();
+        } else {
+          playerId = null;
+        }
       });
     }
   }
@@ -120,6 +131,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
       MaterialPageRoute(builder: (context) => const LoginScreen()),
           (route) => false,
     );
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_selectedImage == null || playerId == null) return;
+    try {
+      final token = await ApiService.storage.read(key: 'jwt');
+      final dio = Dio();
+      dio.options.headers['Authorization'] = 'Bearer $token';
+      final url = 'http://10.0.2.2:8080/api/game-players/$playerId/images';
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(_selectedImage!.path, filename: _selectedImage!.path.split('/').last),
+      });
+      final response = await dio.post(url, data: formData);
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tải ảnh lên thành công!')),
+          );
+        }
+        setState(() {
+          _selectedImage = null;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: ${response.statusMessage}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi upload ảnh: $e')),
+      );
+    }
   }
 
   @override
@@ -265,6 +317,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       child: _SettingRow(icon: Icons.policy, label: "Chính sách", color: Colors.red),
                     ),
+                    const SizedBox(height: 8),
+                    if (isPlayer)
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: _SettingRow(
+                          icon: Icons.cloud_upload,
+                          label: 'Tải ảnh lên',
+                          color: Colors.blue,
+                        ),
+                      ),
+                    if (_selectedImage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 48, top: 4, bottom: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.image, color: Colors.blue, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(_selectedImage!.path.split('/').last)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: _uploadImage,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrange,
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: const Text('Tải lên', style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 24),
                   ],
                 ),
